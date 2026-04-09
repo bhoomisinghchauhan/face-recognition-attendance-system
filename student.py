@@ -505,14 +505,12 @@ class Student:
                                                                                                                 self.var_address.get(),
                                                                                                                 self.var_teacher.get(),
                                                                                                                 self.var_radio1.get(),
-                                                                                                                 self.var_std_id.get()==id+1         
+                                                                                                                self.var_std_id.get()         
                                                                                                                                   ))  
                 conn.commit()
                 self.fetch_data()
                 self.reset_data()
                 conn.close()
-
-
 
                 # haar cascaade is a ml approach to face recognition
                 #load predefined data on face frontals from opencv
@@ -547,8 +545,6 @@ class Student:
                 messagebox.showinfo("Result","Generating data sets completed !!!") 
             except Exception as es:
                 messagebox.showerror("Error",f"Due To:{str(es)}",parent=self.root)
-
-
 
 if __name__ == "__main__":
     root = Tk()

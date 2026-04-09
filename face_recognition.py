@@ -112,7 +112,7 @@ class Face_Recognition:
                 unknown_count = 0
 
             # close only after 5 unknown detections
-            if unknown_count >= 10:
+            if unknown_count >= 5:
                 cv2.waitKey(1000)
                 break
 
