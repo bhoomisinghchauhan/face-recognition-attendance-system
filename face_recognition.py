@@ -3,6 +3,8 @@ import tkinter as tk
 from PIL import Image, ImageTk
 import mysql.connector
 import cv2
+from time import strftime
+from datetime import datetime
 
 
 class Face_Recognition:
@@ -44,6 +46,22 @@ class Face_Recognition:
 
         self.canvas.create_window(750, 560, window=btn)
 
+    # attendance
+
+    def mark_attendance(self,i,r,n,d):
+        with open("attendance.csv","r+",newline="\n") as f:
+            myDataList = f.readlines()
+            name_list = []
+            for line in myDataList:
+                entry = line.split((",")) 
+                name_list.append(entry[0])
+            if((i not in name_list) and (r not in name_list) and (n not in name_list) and (d not in name_list)):
+                now = datetime.now()
+                d1 = now.strftime("%d/%m/%Y")
+                dtString = now.strftime("%H:%M:%S")
+                f.writelines(f"\n{i},{r},{n},{d},{dtString},{d1},Present")
+
+
     # ================= FACE RECOGNITION =================
     def face_recog(self):
         def draw_boundary(img, classifier, scaleFactor, minNeighbors, clf):
@@ -64,22 +82,25 @@ class Face_Recognition:
                 )
                 my_cursor = conn.cursor()
 
-                my_cursor.execute("SELECT name, roll, department FROM student WHERE student_id=%s", (id,))
+                my_cursor.execute("SELECT student_id, name, roll, department FROM student WHERE student_id=%s", (id,))
                 result = my_cursor.fetchone()
 
                 if result:
-                    n, r, d = result
+                    i, n, r, d = result
                 else:
-                    n, r, d = "Unknown", "Unknown", "Unknown"
+                    i, n, r, d = "Unknown", "Unknown", "Unknown", "Unknown"
 
                 if confidence > 77:
                     cv2.rectangle(img, (x, y), (x+w, y+h), (0, 255, 0), 3)
+                    cv2.putText(img, f"ID: {i}", (x, y-75),
+                                cv2.FONT_HERSHEY_COMPLEX, 0.8, (255, 255, 255), 2)
                     cv2.putText(img, f"Roll: {r}", (x, y-55),
                                 cv2.FONT_HERSHEY_COMPLEX, 0.8, (255, 255, 255), 2)
                     cv2.putText(img, f"Name: {n}", (x, y-30),
                                 cv2.FONT_HERSHEY_COMPLEX, 0.8, (255, 255, 255), 2)
                     cv2.putText(img, f"Department: {d}", (x, y-5),
                                 cv2.FONT_HERSHEY_COMPLEX, 0.8, (255, 255, 255), 2)
+                    self.mark_attendance(i,r,n,d)
                 else:
                     unknown_detected = True
                     cv2.rectangle(img, (x, y), (x+w, y+h), (0, 0, 255), 3)
